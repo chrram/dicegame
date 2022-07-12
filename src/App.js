@@ -1,130 +1,92 @@
 
-import { useState } from "react";
-import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { configureStore, current } from '@reduxjs/toolkit'
+import { Provider } from 'react-redux'
+import { createSlice } from '@reduxjs/toolkit'
+import { useSelector } from 'react-redux'
+
+import { StartScreen } from "./components/startScreen"
+import { LoginScreen } from "./components/loginScreen"
+import { RegisterScreen } from "./components/registerScreen";
+import { MenuScreen } from "./components/MenuScreen";
+import { GameScreen } from "./components/gamescreen";
+import { TopPlayerScreen } from './components/topPlayerScreen';
 
 const Stack = createNativeStackNavigator();
 
+const initialState = {
+  token: "",
+  email: "",
+  userScore: null,
+}
+
+export const authenticationSlice = createSlice({
+  name: 'login',
+  initialState,
+  reducers: {
+    token: (state, action) => {
+      state.token = action.payload
+    },
+    userInfo: (state, action) => {
+      state.email = action.payload.email
+      state.userScore = action.payload.score
+    },
+    logout: (state, action) => {
+      state.token = ""
+      state.email = ""
+      state.userScore = null
+    }
+  }
+})
+
+export const { token, logout, userInfo } = authenticationSlice.actions
+
+
+const store = configureStore({
+  reducer: {
+
+    authentication: authenticationSlice.reducer
+
+  },
+})
+
 function App() {
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-
-        <Stack.Screen name="Home" component={StartScreen} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Menu" component={Menu} />
-        <Stack.Screen name="GameScreen" component={GameScreen} />
-
-      </Stack.Navigator>
-    </NavigationContainer >
+    <Provider store={store}>
+      <Navigators />
+    </Provider>
   );
 }
 
-const Menu = ({navigation}) => {
-  return (
-    <View>
-      <TouchableOpacity style={[styles.button, { backgroundColor: "lightgreen" }]} onPress={() => navigation.navigate('GameScreen')}>
-        <Text style={{ color: "white", fontWeight: "bold" }}> Play dice game </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.button, { backgroundColor: "lightgreen" }]} onPress={() => navigation.navigate('Login')}>
-        <Text style={{ color: "white", fontWeight: "bold" }}> See top scores </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.button, { backgroundColor: "lightgreen" }]} onPress={() => navigation.goBack()}>
-        <Text style={{ color: "white", fontWeight: "bold" }}> Logout </Text>
-      </TouchableOpacity>
+const Navigators = () => {
 
-    </View>
-  )
-}
-
-const GameScreen = ({navigation}) => {
-
-  const [currentValue, setCurrentValue] = useState("")
-  const [score, setScore] = useState(0)
+  const token = useSelector((state) => state.authentication.token)
 
   return (
-    <View>
-      <TouchableOpacity>
-        Play a round.
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        Logout
-      </TouchableOpacity>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        {
+          token ? (
+            <>
+              <Stack.Screen name="Menu" component={MenuScreen} />
+              <Stack.Screen name="GameScreen" component={GameScreen} />
+              <Stack.Screen name="Top" component={TopPlayerScreen} />
+            </>
+          ) : (
+            <>
+
+              <Stack.Screen name="Home" component={StartScreen} />
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Register" component={RegisterScreen} />
+              
+            </>
+          )
+        }
+      </Stack.Navigator>
+    </NavigationContainer >
   )
 }
-
-const StartScreen =  ({navigation}) => {
-  return (
-    <View>
-      <Text>
-        Test goes here
-      </Text>
-      <TouchableOpacity style={[styles.button, { backgroundColor: "lightgreen" }]} onPress={() => navigation.navigate('Login')}>
-        <Text style={{ color: "white", fontWeight: "bold" }}> Next screen </Text>
-      </TouchableOpacity>
-    </View>
-  )
-}
-
-const Login = ({navigation}) => {
-
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-
-
-
-  const sendLogin = () => {
-    navigation.navigate("Menu")
-  }
-
-  return (
-    <View style={styles.app}>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        <TouchableOpacity style={[styles.button, { backgroundColor: "lightgreen" }]} onPress={() => sendLogin()}>
-          <Text style={{ color: "white", fontWeight: "bold" }}>  Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button]} onPress={() => sendLogin()}>
-          <Text style={{ color: "white", fontWeight: "bold" }}>  Don't have an account? Register here!</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  )
-}
-
-const GameBoard = () => {
-  return (
-    <View>
-      <View style={styles.border}>
-
-      </View>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  app: {
-    marginHorizontal: "auto",
-    maxWidth: 1500,
-    height: "100%",
-  },
-  button: {
-    textAlign: "center",
-    width: 300,
-    padding: 15,
-    fontWeight: "bold",
-    borderRadius: 20,
-    backgroundColor: "red",
-    marginHorizontal: 10,
-  },
-
-  border: {
-    borderColor: "black",
-    borderStyle: "1px",
-    borderWidth: 5,
-  }
-});
 
 export default App;
