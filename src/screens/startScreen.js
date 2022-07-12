@@ -60,7 +60,7 @@ export const StartScreen = ({ navigation }) => {
 
             
             <View style={styles.logo}>
-                <Animated.Image style={[styles.image, animations]} source={require("../dicegame.jpeg")} />
+                <Animated.Image style={[styles.image, animations]} source={require("../assets/dicegame.jpeg")} />
             </View>
 
             <TouchableOpacity disabled={buttonDisabled} style={[styles.button]} onPress={() => imagePressed()}>

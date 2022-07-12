@@ -1,17 +1,17 @@
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { configureStore, current } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import { createSlice } from '@reduxjs/toolkit'
 import { useSelector } from 'react-redux'
 
-import { StartScreen } from "./components/startScreen"
-import { LoginScreen } from "./components/loginScreen"
-import { RegisterScreen } from "./components/registerScreen";
-import { MenuScreen } from "./components/MenuScreen";
-import { GameScreen } from "./components/gamescreen";
-import { TopPlayerScreen } from './components/topPlayerScreen';
+import { StartScreen } from "./screens/startScreen"
+import { LoginScreen } from "./screens/loginScreen"
+import { RegisterScreen } from "./screens/registerScreen";
+import { MenuScreen } from "./screens/MenuScreen";
+import { GameScreen } from "./screens/gamescreen";
+import { TopPlayerScreen } from './screens/topPlayerScreen';
 
 const Stack = createNativeStackNavigator();
 
