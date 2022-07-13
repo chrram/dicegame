@@ -9,16 +9,54 @@ export const RegisterScreen = ({ navigation }) => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [validFields, setValidFields] = useState(false)
-
+    const [emailError, setEmailError] = useState(false)
+    const [passwordError, setPasswordError] = useState(false)
 
     const validateLogin = () => {
-        console.log("validation goes here")
 
-        registerUser()
+        if (!email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+            setEmailError(true)
+        }
+
+        if (!password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
+            setPasswordError(true)
+        }
+
+
+        if (!(emailError || passwordError)) {
+            registerUser()
+        }
     }
 
     const registerUser = () => {
-        console.log("registration goes here")
+        
+        fetch('http://localhost:8080/users', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded", "Accept": "*/*"
+            },
+            body: `email=${email}&password=${password}`
+        }).then(response => {
+
+            if (response.status === 201) {
+                return response.json()
+            } else {
+                throw new Error(response.status)
+            }
+        })
+            .then(data => {
+
+                console.log("data here")
+            })
+            .catch((error) => {
+
+                if (error.message === "400") {
+                    console.log("400")
+                } else {
+                    console.log("Network error")
+                }
+
+            });
     }
 
     useEffect(() => {
@@ -27,12 +65,12 @@ export const RegisterScreen = ({ navigation }) => {
             Animated.sequence([
                 Animated.timing(registerButtonAnimationValue, {
                     toValue: 1,
-                    duration:300,
+                    duration: 300,
                     useNativeDriver: true,
                 }),
                 Animated.timing(registerButtonAnimationValue, {
                     toValue: 0,
-                    duration:300,
+                    duration: 300,
                     useNativeDriver: true,
                 })
             ])
@@ -52,13 +90,16 @@ export const RegisterScreen = ({ navigation }) => {
                     value={email}
                     onChangeText={(text) => {
                         setEmail(text)
-                        
+                        console.log("tte");
+                        if (emailError && text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+                            setEmailError(false)
+                        }
                     }}
 
                     onFocus={() => {
-                        console.log('Username focused');
+                        console.log('Email focused');
                     }}
-                    style={styles.inputFields}
+                    style={[styles.inputFields, { borderWidth: emailError ? 20 : 1 }]}
                 />
 
                 <Text style={styles.inputLabels}>Password</Text>
@@ -68,14 +109,27 @@ export const RegisterScreen = ({ navigation }) => {
                     secureTextEntry={true}
                     onChangeText={(text) => {
                         setPassword(text)
-                      
+
+                        if (passwordError && text.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
+                            setPasswordError(false)
+                        }
                     }}
                     onFocus={() => {
                         console.log('Password focused');
                     }}
-                    style={styles.inputFields}
+                    style={[styles.inputFields, { borderWidth: passwordError ? 20 : 1 }]}
                 />
             </View>
+
+            {
+                emailError || passwordError ? (
+                    <>
+                    <Text style={{fontWeight: "bold", color: "red"}}>Your credential are wrong</Text>
+                    <Text style={{fontWeight: "bold", color: "red"}}>Your credential are wrong</Text>
+                    <Text style={{fontWeight: "bold", color: "red"}}>Your credential are wrong</Text>
+                    </>
+                ) : null
+            }
             <View style={{}}>
 
                 <Animated.View style={{
@@ -92,6 +146,7 @@ export const RegisterScreen = ({ navigation }) => {
                 </TouchableOpacity>
 
             </View>
+
         </View>
     )
 }
