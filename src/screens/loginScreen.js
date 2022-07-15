@@ -10,6 +10,8 @@ export const LoginScreen = ({ navigation }) => {
     const [loginError, setLoginError] = useState(false)
     const [disabledInteraction, setDisabledInteraction] = useState(false)
 
+    const [hiddenPassword, setHiddenPassword] = useState(true)
+
     const loginErrorAnimation = useRef(new Animated.Value(0)).current;
     const loginSuccessAnimation = useRef(new Animated.Value(0)).current;
 
@@ -129,23 +131,44 @@ export const LoginScreen = ({ navigation }) => {
                     onFocus={() => {
                         console.log('Username focused');
                     }}
-                    style={styles.inputFields}
+                    style={[styles.inputFields, {border: "1px solid red", width:365}]}
                 />
 
                 <Text style={styles.inputLabels}>Password</Text>
-                <TextInput
-                    editable={!loginError && !disabledInteraction}
-                    autoFocus
-                    value={password}
-                    secureTextEntry={true}
-                    onChangeText={(text) => {
-                        setPassword(text)
+
+                <View style={{flexDirection:"row", border: "1px solid red"}}>
+                    <TextInput
+                        editable={!loginError && !disabledInteraction}
+                        autoFocus
+                        value={password}
+                        secureTextEntry={hiddenPassword}
+                        onChangeText={(text) => {
+                            setPassword(text)
+                        }}
+                        onFocus={() => {
+                            console.log('Password focused');
+                        }}
+                        style={styles.inputFields}
+
+                    />
+
+                    <TouchableOpacity onPressIn={() => {
+                        setHiddenPassword(false)
                     }}
-                    onFocus={() => {
-                        console.log('Password focused');
-                    }}
-                    style={styles.inputFields}
-                />
+                        onPressOut={() => {
+                            setHiddenPassword(true)
+                        }}
+                        disabled={loginError || disabledInteraction}
+                        style={{justifyContent: 'center',
+                        alignItems: 'center',
+                        padding:10,
+                        display: "flex"}}
+                    >
+                        <Text style={{fontSize:10, fontWeight: "bold"}}>Show</Text>
+                    </TouchableOpacity>
+                </View>
+
+
             </Animated.View>
 
             <View style={{}}>
@@ -187,7 +210,7 @@ const styles = StyleSheet.create({
         width: 300,
         padding: 20,
         outlineStyle: "none",
-        border: "1px solid red"
+
     },
     inputLabels: {
         fontWeight: "bold"

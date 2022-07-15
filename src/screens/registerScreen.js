@@ -5,14 +5,24 @@ import { TouchableOpacity, StyleSheet, Text, View, TextInput, Animated } from "r
 export const RegisterScreen = ({ navigation }) => {
 
     const registerButtonAnimationValue = useRef(new Animated.Value(0)).current;
+    const successRegistration = useRef(new Animated.Value(0)).current;
+    const errorRegistration = useRef(new Animated.Value(0)).current;
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [validFields, setValidFields] = useState(false)
+
     const [emailError, setEmailError] = useState(false)
     const [passwordError, setPasswordError] = useState(false)
 
+    const [firstTimeValidated, setFirstTimeValidated] = useState(false)
+
+    const [hiddenPassword, setHiddenPassword] = useState(true)
+
     const validateLogin = () => {
+
+        setFirstTimeValidated(true)
+
+        const correctCredentials = email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)
 
         if (!email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
             setEmailError(true)
@@ -23,40 +33,61 @@ export const RegisterScreen = ({ navigation }) => {
         }
 
 
-        if (!(emailError || passwordError)) {
+        if (correctCredentials) {
             registerUser()
         }
+
     }
 
     const registerUser = () => {
-        
-        fetch('http://localhost:8080/users', {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded", "Accept": "*/*"
-            },
-            body: `email=${email}&password=${password}`
-        }).then(response => {
 
-            if (response.status === 201) {
-                return response.json()
-            } else {
-                throw new Error(response.status)
-            }
-        })
-            .then(data => {
+        const realRegister = false
 
-                console.log("data here")
-            })
-            .catch((error) => {
+        if (realRegister) {
 
-                if (error.message === "400") {
-                    console.log("400")
+            fetch('http://localhost:8080/users', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded", "Accept": "*/*"
+                },
+                body: `email=${email}&password=${password}`
+            }).then(response => {
+
+                if (response.status === 201) {
+                    return response.json()
                 } else {
-                    console.log("Network error")
+                    throw new Error(response.status)
                 }
+            })
+                .then(data => {
+                    Animated.timing(successRegistration, {
+                        toValue: 1,
+                        duration: 2000,
+                        useNativeDriver: true,
+                    }).start(({ finished }) => {
+                        navigation.goBack()
+                    })
+                })
+                .catch((error) => {
+                    if (error.message === "400") {
 
-            });
+                    } else {
+                        console.log("Network error")
+                    }
+
+                });
+
+        } else {
+            Animated.timing(successRegistration, {
+                toValue: 1,
+                duration: 2000,
+                useNativeDriver: true,
+            }).start(({ finished }) => {
+                navigation.goBack()
+            })
+        }
+
+
     }
 
     useEffect(() => {
@@ -76,57 +107,105 @@ export const RegisterScreen = ({ navigation }) => {
             ])
         ).start()
 
-
     }, [])
 
-    console.log(validFields, " valid fields")
+    useEffect(() => {
+
+        if (emailError || passwordError) {
+            Animated.timing(errorRegistration, {
+                toValue: 2,
+                duration: 500,
+                useNativeDriver: true,
+            }).start()
+        }
+
+        console.log("rerender this");
+    }, [emailError, passwordError])
+
+
+    const boxShake = {
+        transform: ([{
+            rotate: errorRegistration.interpolate({ inputRange: [0, 1, 2], outputRange: ['0deg', '-20deg', '0deg'] })
+        }]),
+    }
+
     return (
         <View style={styles.app}>
 
-            <View style={{ border: "1px solid red", padding: 30 }}>
+            <Animated.View style={[emailError || passwordError ? boxShake : null, { borderColor: successRegistration.interpolate({ inputRange: [0, 1], outputRange: ["red", "green"] }), border: "1px solid red", padding: 30 }]}>
                 <Text style={styles.inputLabels}>Email</Text>
                 <TextInput
                     autoFocus
                     value={email}
                     onChangeText={(text) => {
                         setEmail(text)
-                        console.log("tte");
-                        if (emailError && text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+                        if (firstTimeValidated && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/))
+                            setEmailError(true)
+                        else if (firstTimeValidated && text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
                             setEmailError(false)
                         }
-                    }}
 
-                    onFocus={() => {
-                        console.log('Email focused');
                     }}
-                    style={[styles.inputFields, { borderWidth: emailError ? 20 : 1 }]}
+                    onFocus={() => {
+
+                    }}
+                    style={[styles.inputFields, { borderColor:"red", borderWidth: emailError ? 5 : 1, width: 360 }]}
                 />
 
                 <Text style={styles.inputLabels}>Password</Text>
-                <TextInput
-                    autoFocus
-                    value={password}
-                    secureTextEntry={true}
-                    onChangeText={(text) => {
-                        setPassword(text)
 
-                        if (passwordError && text.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
-                            setPasswordError(false)
-                        }
+                <View style={{ flexDirection: "row", borderColor: "red", borderWidth: passwordError ? 5 : 1 }}>
+                    <TextInput
+                        autoFocus
+                        value={password}
+                        secureTextEntry={hiddenPassword}
+                        onChangeText={(text) => {
+                            setPassword(text)
+
+                            if (firstTimeValidated && !text.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
+                                setPasswordError(true)
+                            }
+
+                            else if (firstTimeValidated && text.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
+                                setPasswordError(false)
+                            }
+
+                        }}
+                        onFocus={() => {
+                            console.log('Password focused');
+                        }}
+                        style={[styles.inputFields,]}
+                    />
+
+                    <TouchableOpacity onPressIn={() => {
+                        setHiddenPassword(false)
                     }}
-                    onFocus={() => {
-                        console.log('Password focused');
-                    }}
-                    style={[styles.inputFields, { borderWidth: passwordError ? 20 : 1 }]}
-                />
-            </View>
+                        onPressOut={() => {
+                            setHiddenPassword(true)
+                        }}
+                        style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: 10,
+                            display: "flex"
+                        }}
+                    >
+                        <Text style={{ fontSize: 10, fontWeight: "bold" }}>Show</Text>
+                    </TouchableOpacity>
+                </View>
+
+            </Animated.View>
 
             {
                 emailError || passwordError ? (
                     <>
-                    <Text style={{fontWeight: "bold", color: "red"}}>Your credential are wrong</Text>
-                    <Text style={{fontWeight: "bold", color: "red"}}>Your credential are wrong</Text>
-                    <Text style={{fontWeight: "bold", color: "red"}}>Your credential are wrong</Text>
+                        <Text style={{ fontWeight: "bold", color: "red" }}>Your credentials are wrong</Text>
+                        {
+                            emailError ? <Text style={{ fontWeight: "bold", color: "red" }}>Your email is wrong</Text> : null
+                        }
+                        {
+                            passwordError ? <Text style={{ fontWeight: "bold", color: "red" }}>Your Password is wrong</Text> : null
+                        }
                     </>
                 ) : null
             }
@@ -166,7 +245,7 @@ const styles = StyleSheet.create({
         width: 300,
         padding: 20,
         outlineStyle: "none",
-        border: "1px solid red"
+
     },
     inputLabels: {
         fontWeight: "bold"

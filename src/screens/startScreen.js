@@ -35,7 +35,7 @@ export const StartScreen = ({ navigation }) => {
             }),
 
         ]).start(({ finished }) => {
-            console.log("ffff")
+            
             navigation.navigate('Login')
         });
 

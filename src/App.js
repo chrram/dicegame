@@ -12,6 +12,7 @@ import { RegisterScreen } from "./screens/registerScreen";
 import { MenuScreen } from "./screens/MenuScreen";
 import { GameScreen } from "./screens/gamescreen";
 import { TopPlayerScreen } from './screens/topPlayerScreen';
+import { OptionScreen } from './screens/optionScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -73,6 +74,7 @@ const Navigators = () => {
               <Stack.Screen name="Menu" component={MenuScreen} />
               <Stack.Screen name="GameScreen" component={GameScreen} />
               <Stack.Screen name="Top" component={TopPlayerScreen} />
+              <Stack.Screen name="Options" component={OptionScreen} />
             </>
           ) : (
             <>

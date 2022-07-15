@@ -73,7 +73,7 @@ export const MenuScreen = ({ navigation }) => {
                     <Text style={{ color: "white", fontWeight: "bold" }}> See top scores </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={() => console.log("options goes here")}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Options")}>
                     <Text style={{ color: "white", fontWeight: "bold" }}> Options </Text>
                 </TouchableOpacity>
 
