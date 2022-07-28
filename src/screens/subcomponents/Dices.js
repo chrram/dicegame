@@ -6,6 +6,7 @@ export const Dices = memo(({ numbersArray }) => {
     const Dice = ({ number }) => {
 
         const spinAnimation = useRef(new Animated.Value(0)).current;
+
         useEffect(() => {
 
             Animated.timing(spinAnimation, {
@@ -131,13 +132,30 @@ export const Dices = memo(({ numbersArray }) => {
         }
     }
 
+    const initializationAnimation = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+
+        Animated.timing(initializationAnimation, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+        }).start()
+
+    }, [])
+
+
     console.log(numbersArray, "dices rerender")
     return (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        <Animated.View style={{
+            opacity: initializationAnimation.interpolate({ inputRange: [0, 1], outputRange: [0, 1] }),
+            flexDirection: 'row',
+            flexWrap: 'wrap'
+        }}>
             {
                 numbersArray.map((k, i) => <Dice key={i} number={k} />)
             }
-        </View>
+        </Animated.View>
     )
 })
 
