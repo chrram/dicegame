@@ -34,13 +34,9 @@ export const OptionScreen = ({ navigation }) => {
                         <Text style={{ color: "white", fontWeight: "bold" }}> Delete Account </Text>
                     </TouchableOpacity>
 
-
                 </View>
                 <Text>Your highscore : {userScore}</Text>
             </View>
-
-
-
 
             <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
                 <Text style={{ color: "white", fontWeight: "bold" }}> Go back </Text>

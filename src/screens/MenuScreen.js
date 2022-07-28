@@ -31,7 +31,7 @@ export const MenuScreen = ({ navigation }) => {
                     useNativeDriver: true,
                 })
             ])
-            
+
         ).start()
 
         Animated.timing(menuOpacity, {
@@ -48,7 +48,7 @@ export const MenuScreen = ({ navigation }) => {
             opacity: menuOpacity,
             padding: menuOpacity.interpolate({
                 inputRange: [0, 1],
-                outputRange: [0,70]
+                outputRange: [0, 70]
             }),
         }
     ];
@@ -60,7 +60,6 @@ export const MenuScreen = ({ navigation }) => {
             <Animated.View style={[{
                 borderRadius: 30,
                 borderColor: "red",
-                // padding: 50,
                 borderWidth:
                     animationVariable.interpolate({ inputRange: [0, 1], outputRange: [1, 5] }),
             }, animatedStyles]}>

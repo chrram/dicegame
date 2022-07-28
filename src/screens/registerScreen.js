@@ -8,8 +8,8 @@ export const RegisterScreen = ({ navigation }) => {
     const successRegistration = useRef(new Animated.Value(0)).current;
     const errorRegistration = useRef(new Animated.Value(0)).current;
 
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const [email, setEmail] = useState("anc@ju.se")
+    const [password, setPassword] = useState("abcDEF4")
 
     const [emailError, setEmailError] = useState(false)
     const [passwordError, setPasswordError] = useState(false)
@@ -17,6 +17,8 @@ export const RegisterScreen = ({ navigation }) => {
     const [firstTimeValidated, setFirstTimeValidated] = useState(false)
 
     const [hiddenPassword, setHiddenPassword] = useState(true)
+
+    const [success, setSuccess] = useState(false)
 
     const validateLogin = () => {
 
@@ -31,7 +33,6 @@ export const RegisterScreen = ({ navigation }) => {
         if (!password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
             setPasswordError(true)
         }
-
 
         if (correctCredentials) {
             registerUser()
@@ -78,6 +79,9 @@ export const RegisterScreen = ({ navigation }) => {
                 });
 
         } else {
+
+            setSuccess(true)
+
             Animated.timing(successRegistration, {
                 toValue: 1,
                 duration: 2000,
@@ -119,20 +123,28 @@ export const RegisterScreen = ({ navigation }) => {
             }).start()
         }
 
-        console.log("rerender this");
     }, [emailError, passwordError])
 
 
     const boxShake = {
         transform: ([{
             rotate: errorRegistration.interpolate({ inputRange: [0, 1, 2], outputRange: ['0deg', '-20deg', '0deg'] })
-        }]),
+        }])
     }
 
     return (
         <View style={styles.app}>
 
-            <Animated.View style={[emailError || passwordError ? boxShake : null, { borderColor: successRegistration.interpolate({ inputRange: [0, 1], outputRange: ["red", "green"] }), border: "1px solid red", padding: 30 }]}>
+            <Animated.View style={[emailError || passwordError ? boxShake : null,
+            {
+                borderColor: successRegistration.interpolate({ inputRange: [0, 1], outputRange: ["red", "green"] }),
+                border: "1px solid red",
+                padding: 30,
+                backgroundColor: successRegistration.interpolate({
+                    inputRange: [1, 2, 3],
+                    outputRange: ["white", "green", "white"]
+                }),
+            }]}>
                 <Text style={styles.inputLabels}>Email</Text>
                 <TextInput
                     autoFocus
@@ -149,7 +161,7 @@ export const RegisterScreen = ({ navigation }) => {
                     onFocus={() => {
 
                     }}
-                    style={[styles.inputFields, { borderColor:"red", borderWidth: emailError ? 5 : 1, width: 360 }]}
+                    style={[styles.inputFields, { borderColor: "red", borderWidth: emailError ? 5 : 1, width: 360 }]}
                 />
 
                 <Text style={styles.inputLabels}>Password</Text>
@@ -197,26 +209,29 @@ export const RegisterScreen = ({ navigation }) => {
             </Animated.View>
 
             {
-                emailError || passwordError ? (
+                emailError || passwordError && (
                     <>
                         <Text style={{ fontWeight: "bold", color: "red" }}>Your credentials are wrong</Text>
                         {
-                            emailError ? <Text style={{ fontWeight: "bold", color: "red" }}>Your email is wrong</Text> : null
+                            emailError && <Text style={{ fontWeight: "bold", color: "red" }}>Your email is wrong</Text>
                         }
                         {
-                            passwordError ? <Text style={{ fontWeight: "bold", color: "red" }}>Your Password is wrong</Text> : null
+                            passwordError && <Text style={{ fontWeight: "bold", color: "red" }}>Your Password is wrong</Text>
                         }
                     </>
-                ) : null
+                )
             }
             <View style={{}}>
 
                 <Animated.View style={{
                     marginVertical: 20,
                     borderRadius: 20,
+                    transform: [{
+                        rotateY: successRegistration.interpolate({ inputRange: [0, 1], outputRange: [0 + "deg", 360 + "deg"] })
+                    }]
                 }}>
                     <TouchableOpacity style={styles.button} onPress={() => validateLogin()}>
-                        <Text style={{ color: "white", fontWeight: "bold" }}> Register user </Text>
+                        <Text style={{ color: "white", fontWeight: "bold" }}> {success ? "Successfully registered" : "Register user"} </Text>
                     </TouchableOpacity>
                 </Animated.View>
 
@@ -231,7 +246,6 @@ export const RegisterScreen = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
-
     app: {
         marginHorizontal: "auto",
         width: "100%",
@@ -260,5 +274,4 @@ const styles = StyleSheet.create({
         backgroundImage: "linear-gradient(to right, #D31027 0%, #EA384D  51%, #D31027  100%);",
         marginVertical: 0,
     },
-
 });

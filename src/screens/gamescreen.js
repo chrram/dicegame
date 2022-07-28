@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { TouchableOpacity, StyleSheet, Text, View, Animated } from "react-native";
+import { TouchableOpacity, StyleSheet, Text, View, Animated, Easing } from "react-native";
 import { useSelector, useDispatch } from 'react-redux'
 import { Slider } from '@miblanchard/react-native-slider';
 
@@ -27,6 +27,7 @@ export const GameScreen = ({ navigation }) => {
     const [newRecord, setNewRecord] = useState(false)
 
     const animationVariable = useRef(new Animated.Value(0)).current;
+    const screenAnimation = useRef(new Animated.Value(0)).current;
 
     const dispatch = useDispatch()
 
@@ -105,9 +106,25 @@ export const GameScreen = ({ navigation }) => {
         ).start()
     })
 
+    useEffect(() => {
+
+        Animated.timing(screenAnimation, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+            easing: Easing.elastic(1)
+        }).start()
+
+    }, [])
+
     return (
-        
-        <View style={styles.app}>
+
+        <Animated.View style={[styles.app, {
+            transform: [{
+                scaleY: screenAnimation.interpolate({ inputRange: [0, 1], outputRange: [0, 1] })
+            }],
+            opacity: screenAnimation.interpolate({ inputRange: [0, 1], outputRange: [0, 1] })
+        }]}>
 
             {round == 0 ?
                 (<Text style={{ fontWeight: "bold", marginVertical: 5, fontSize: 30, color: "red" }}> Game over!</Text>) :
@@ -117,45 +134,44 @@ export const GameScreen = ({ navigation }) => {
             <Text style={{ fontWeight: "bold", marginVertical: 5, fontSize: 10 }}>Your highest all time score: {userHighestScore}</Text>
             <View style={styles.border}>
                 {
-                    round !== INITIAL_GAMEROUNDS ?
-                        (
-                            <View style={{}}>
+                    round !== INITIAL_GAMEROUNDS &&
+                    (
+                        <View style={{}}>
 
-                                <Dices numbersArray={dices} />
+                            <Dices numbersArray={dices} />
 
-                                <View style={{ marginHorizontal: 10, marginVertical: 10, width: 470, }}>
+                            <View style={{ marginHorizontal: 10, marginVertical: 10, width: 470, }}>
 
-                                    {
-                                        win ?
-                                            (
-                                                <View>
-                                                    <Animated.Text style={{ color: "green", fontSize: 20, textAlign: "center", opacity: animationVariable.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) }}>
-                                                        You win this round!
-                                                    </Animated.Text>
-                                                    <Text style={{ fontSize: 20, textAlign: "center" }}>
-                                                        You guessed {winningNumber} which is correct.
-                                                    </Text>
-                                                </View>
-                                            )
-                                            :
-                                            (
-                                                <View>
-                                                    <Text style={{ color: "red", fontSize: 20, textAlign: "center" }}>
-                                                        You lose this round!
-                                                    </Text>
-                                                    <Text style={{ fontSize: 20, textAlign: "center" }}>
-                                                        You guessed {guessedNumber} which is not {winningNumber}.
-                                                    </Text>
-                                                </View>
-                                            )
-                                    }
-                                </View>
+                                {
+                                    win ?
+                                        (
+                                            <View>
+                                                <Animated.Text style={{ color: "green", fontSize: 20, textAlign: "center", opacity: animationVariable.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) }}>
+                                                    You win this round!
+                                                </Animated.Text>
+                                                <Text style={{ fontSize: 20, textAlign: "center" }}>
+                                                    You guessed {winningNumber} which is correct.
+                                                </Text>
+                                            </View>
+                                        )
+                                        :
+                                        (
+                                            <View>
+                                                <Text style={{ color: "red", fontSize: 20, textAlign: "center" }}>
+                                                    You lose this round!
+                                                </Text>
+                                                <Text style={{ fontSize: 20, textAlign: "center" }}>
+                                                    You guessed {guessedNumber} which is not {winningNumber}.
+                                                </Text>
+                                            </View>
+                                        )
+                                }
                             </View>
-                        ) : null
+                        </View>
+                    )
                 }
             </View>
             <View style={{ width: 300, textAlign: "center" }}>
-
 
                 <Slider
                     minimumValue={3}
@@ -166,7 +182,7 @@ export const GameScreen = ({ navigation }) => {
                     onValueChange={value => setSliderNumber(value)}
                 />
                 {
-                    round === INITIAL_GAMEROUNDS ? <Text>Start playing by choosing a number below.</Text> : null
+                    round === INITIAL_GAMEROUNDS && <Text>Start playing by choosing a number below.</Text>
                 }
                 <Text style={{ fontSize: 20 }}>Number: {sliderNumber}</Text>
             </View>
@@ -184,7 +200,8 @@ export const GameScreen = ({ navigation }) => {
                             alignItems: 'center',
                         }}>
                             {newRecord ?
-                                <Animated.Text style={{ opacity: animationVariable.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }), fontWeight: "bold", color: "green", fontSize: 30 }}>Congratulations! You have reached a new best!</Animated.Text>
+                                <Animated.Text
+                                    style={{ opacity: animationVariable.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }), fontWeight: "bold", color: "green", fontSize: 30 }}>Congratulations! You have reached a new best!</Animated.Text>
                                 : null}
 
                             <TouchableOpacity style={styles.button} onPress={() => restart()}>
@@ -196,7 +213,7 @@ export const GameScreen = ({ navigation }) => {
             <TouchableOpacity style={[styles.button, { backgroundColor: "white", backgroundImage: "", border: "1px solid red" }]} onPress={() => stopPlaying()}>
                 <Text style={{ color: "black", fontWeight: "bold" }}> Stop playing </Text>
             </TouchableOpacity>
-        </View>
+        </Animated.View>
     )
 }
 

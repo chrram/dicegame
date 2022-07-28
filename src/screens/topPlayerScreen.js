@@ -16,7 +16,7 @@ export const TopPlayerScreen = ({ navigation }) => {
     const fetchedDataAnimation = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
-        
+
         fetch('http://localhost:8080/top', {
             method: 'GET',
             headers: {
@@ -36,11 +36,11 @@ export const TopPlayerScreen = ({ navigation }) => {
     }, [])
 
     const fetchAnim = {
-        opacity: fetchedDataAnimation.interpolate({inputRange:[0,1], outputRange:[0,1]}),
-        scale: fetchedDataAnimation.interpolate({inputRange:[0,1], outputRange:[0,1]})
+        opacity: fetchedDataAnimation.interpolate({ inputRange: [0, 1], outputRange: [0, 1] }),
+        scale: fetchedDataAnimation.interpolate({ inputRange: [0, 1], outputRange: [0, 1] })
     }
 
-    if(fetchedUsers){
+    if (fetchedUsers) {
 
         Animated.timing(fetchedDataAnimation, {
             toValue: 1,
@@ -51,7 +51,6 @@ export const TopPlayerScreen = ({ navigation }) => {
 
     }
 
-
     return (
         <View style={styles.app}>
             {
@@ -60,7 +59,7 @@ export const TopPlayerScreen = ({ navigation }) => {
                         <Animated.Text style={fetchAnim} key={i}> {users.email} - {users.score}</Animated.Text>) : <Text>Loading..</Text>
             }
             {
-                error ? <Text>Error occured while fetching</Text> : null
+                error && <Text>Error occured while fetching</Text>
             }
             <TouchableOpacity style={[styles.button]} onPress={() => navigation.goBack()}>
                 <Text style={{ color: "white", fontWeight: "bold" }}> Go back! </Text>

@@ -131,12 +131,12 @@ export const LoginScreen = ({ navigation }) => {
                     onFocus={() => {
                         console.log('Username focused');
                     }}
-                    style={[styles.inputFields, {border: "1px solid red", width:365}]}
+                    style={[styles.inputFields, { border: "1px solid red", width: 365 }]}
                 />
 
                 <Text style={styles.inputLabels}>Password</Text>
 
-                <View style={{flexDirection:"row", border: "1px solid red"}}>
+                <View style={{ flexDirection: "row", border: "1px solid red" }}>
                     <TextInput
                         editable={!loginError && !disabledInteraction}
                         autoFocus
@@ -159,16 +159,16 @@ export const LoginScreen = ({ navigation }) => {
                             setHiddenPassword(true)
                         }}
                         disabled={loginError || disabledInteraction}
-                        style={{justifyContent: 'center',
-                        alignItems: 'center',
-                        padding:10,
-                        display: "flex"}}
+                        style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: 10,
+                            display: "flex"
+                        }}
                     >
-                        <Text style={{fontSize:10, fontWeight: "bold"}}>Show</Text>
+                        <Text style={{ fontSize: 10, fontWeight: "bold" }}>Show</Text>
                     </TouchableOpacity>
                 </View>
-
-
             </Animated.View>
 
             <View style={{}}>
@@ -181,14 +181,14 @@ export const LoginScreen = ({ navigation }) => {
                 </TouchableOpacity>
 
                 {
-                    loginError ? (
+                    loginError && (
                         <Animated.Text style={{
                             textAlign: "center", color: "red", fontWeight: "bold", opacity: loginErrorAnimation.interpolate({
                                 inputRange: [0, 1, 4],
                                 outputRange: [0, 1, 0]
                             })
                         }}> Wrong email or password </Animated.Text>
-                    ) : null
+                    )
                 }
             </View>
         </Animated.View>

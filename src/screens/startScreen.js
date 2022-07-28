@@ -5,7 +5,7 @@ import { TouchableOpacity, StyleSheet, Text, View, Image, Animated, Easing } fro
 export const StartScreen = ({ navigation }) => {
 
     const animationVariable = useRef(new Animated.Value(0)).current;
-    
+
     const spinAnimation1 = useRef(new Animated.Value(0)).current;
     const spinAnimation2 = useRef(new Animated.Value(0)).current;
 
@@ -25,7 +25,7 @@ export const StartScreen = ({ navigation }) => {
     const imagePressed = () => {
 
         setButtonDisabled(true)
-        
+
         Animated.sequence([
 
             Animated.timing(spinAnimation1, {
@@ -35,7 +35,7 @@ export const StartScreen = ({ navigation }) => {
             }),
 
         ]).start(({ finished }) => {
-            
+
             navigation.navigate('Login')
         });
 
@@ -52,20 +52,20 @@ export const StartScreen = ({ navigation }) => {
 
             <Animated.View style={{
                 transform: [{
-                    rotateY: spinAnimation1.interpolate({ inputRange: [0,1], outputRange: [0 + "deg", 360 + "deg"] }),
+                    rotateY: spinAnimation1.interpolate({ inputRange: [0, 1], outputRange: [0 + "deg", 360 + "deg"] }),
                 }],
-                top: spinAnimation1.interpolate({ inputRange: [0, 1], outputRange: [0,-100] }),
-                opacity:spinAnimation1.interpolate({ inputRange: [0, 1], outputRange: [1,0] }),
+                top: spinAnimation1.interpolate({ inputRange: [0, 1], outputRange: [0, -100] }),
+                opacity: spinAnimation1.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
             }}>
 
-            
-            <View style={styles.logo}>
-                <Animated.Image style={[styles.image, animations]} source={require("../assets/dicegame.jpeg")} />
-            </View>
 
-            <TouchableOpacity disabled={buttonDisabled} style={[styles.button]} onPress={() => imagePressed()}>
-                <Text style={styles.buttonText}> Start game! </Text>
-            </TouchableOpacity>
+                <View style={styles.logo}>
+                    <Animated.Image style={[styles.image, animations]} source={require("../assets/dicegame.jpeg")} />
+                </View>
+
+                <TouchableOpacity disabled={buttonDisabled} style={[styles.button]} onPress={() => imagePressed()}>
+                    <Text style={styles.buttonText}> Start game! </Text>
+                </TouchableOpacity>
             </Animated.View>
         </View>
 
