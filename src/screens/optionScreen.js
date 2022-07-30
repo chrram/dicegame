@@ -84,7 +84,7 @@ export const OptionScreen = ({ navigation }) => {
             {
                 accountDeleted ?
                     (<Animated.View style={[{ textAlign: "center" }, rotateAnimation]}>
-                        <Animated.Text style={[{ color: "green", fontWeight: "bold", fontSize: 30 }, animateOpacity]}>Account is deleted</Animated.Text>
+                        <Animated.Text style={[{ color: "green", fontWeight: "bold", fontSize: 30 }, animateOpacity]}>Account is deleted!</Animated.Text>
                         <Animated.Text style={[{ color: "green", fontWeight: "bold", fontSize: 40 }, animateOpacity2]}>Goodbye {email}!</Animated.Text>
                     </Animated.View>)
                     :

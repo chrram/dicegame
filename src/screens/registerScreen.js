@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 
 import { TouchableOpacity, StyleSheet, Text, View, TextInput, Animated } from "react-native";
+import { useDispatch } from 'react-redux'
+
+import { token, userInfo } from "../App";
 
 export const RegisterScreen = ({ navigation }) => {
 
@@ -19,6 +22,8 @@ export const RegisterScreen = ({ navigation }) => {
     const [hiddenPassword, setHiddenPassword] = useState(true)
 
     const [success, setSuccess] = useState(false)
+
+    const dispatch = useDispatch()
 
     const validateLogin = () => {
 
@@ -59,16 +64,17 @@ export const RegisterScreen = ({ navigation }) => {
                 } else {
                     throw new Error(response.status)
                 }
-            })
-                .then(data => {
-                    Animated.timing(successRegistration, {
-                        toValue: 1,
-                        duration: 2000,
-                        useNativeDriver: true,
-                    }).start(({ finished }) => {
-                        navigation.goBack()
-                    })
+            }).then((data) => {
+
+                setSuccess(true)
+
+                successAnimation(() => {
+                    dispatch(token(data.id_token))
+                    dispatch(userInfo({ email: data.email, score: 0 }))
                 })
+
+            })
+
                 .catch((error) => {
                     if (error.message === "400") {
 
@@ -79,19 +85,24 @@ export const RegisterScreen = ({ navigation }) => {
                 });
 
         } else {
-
             setSuccess(true)
-
-            Animated.timing(successRegistration, {
-                toValue: 1,
-                duration: 2000,
-                useNativeDriver: true,
-            }).start(({ finished }) => {
+            successAnimation(() => {
                 navigation.goBack()
             })
+
         }
 
 
+    }
+
+    const successAnimation = (callback) => {
+        Animated.timing(successRegistration, {
+            toValue: 1,
+            duration: 3000,
+            useNativeDriver: true,
+        }).start(({ finished }) => {
+            callback()
+        })
     }
 
     useEffect(() => {
@@ -125,122 +136,138 @@ export const RegisterScreen = ({ navigation }) => {
 
     }, [emailError, passwordError])
 
-
     const boxShake = {
         transform: ([{
             rotate: errorRegistration.interpolate({ inputRange: [0, 1, 2], outputRange: ['0deg', '-20deg', '0deg'] })
         }])
     }
 
+    const rotateAnimation = {
+        transform: [{
+            scale: successRegistration.interpolate({ inputRange: [0, 1], outputRange: [0, 1] })
+        }]
+    }
+
     return (
         <View style={styles.app}>
-
-            <Animated.View style={[emailError || passwordError ? boxShake : null,
             {
-                borderColor: successRegistration.interpolate({ inputRange: [0, 1], outputRange: ["red", "green"] }),
-                border: "1px solid red",
-                padding: 30,
-                backgroundColor: successRegistration.interpolate({
-                    inputRange: [1, 2, 3],
-                    outputRange: ["white", "green", "white"]
-                }),
-            }]}>
-                <Text style={styles.inputLabels}>Email</Text>
-                <TextInput
-                    autoFocus
-                    value={email}
-                    onChangeText={(text) => {
-                        setEmail(text)
-                        if (firstTimeValidated && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/))
-                            setEmailError(true)
-                        else if (firstTimeValidated && text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
-                            setEmailError(false)
-                        }
-
-                    }}
-                    onFocus={() => {
-
-                    }}
-                    style={[styles.inputFields, { borderColor: "red", borderWidth: emailError ? 5 : 1, width: 360 }]}
-                />
-
-                <Text style={styles.inputLabels}>Password</Text>
-
-                <View style={{ flexDirection: "row", borderColor: "red", borderWidth: passwordError ? 5 : 1 }}>
-                    <TextInput
-                        autoFocus
-                        value={password}
-                        secureTextEntry={hiddenPassword}
-                        onChangeText={(text) => {
-                            setPassword(text)
-
-                            if (firstTimeValidated && !text.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
-                                setPasswordError(true)
-                            }
-
-                            else if (firstTimeValidated && text.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
-                                setPasswordError(false)
-                            }
-
-                        }}
-                        onFocus={() => {
-                            console.log('Password focused');
-                        }}
-                        style={[styles.inputFields,]}
-                    />
-
-                    <TouchableOpacity onPressIn={() => {
-                        setHiddenPassword(false)
-                    }}
-                        onPressOut={() => {
-                            setHiddenPassword(true)
-                        }}
-                        style={{
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            padding: 10,
-                            display: "flex"
-                        }}
-                    >
-                        <Text style={{ fontSize: 10, fontWeight: "bold" }}>Show</Text>
-                    </TouchableOpacity>
-                </View>
-
-            </Animated.View>
-
-            {
-                emailError || passwordError && (
+                success ? (
                     <>
-                        <Text style={{ fontWeight: "bold", color: "red" }}>Your credentials are wrong</Text>
+                        <Animated.View style={[{ textAlign: "center" }, rotateAnimation]}>
+                            <Animated.Text style={{ color: "green", fontWeight: "bold", fontSize: 30 }}>Your account is created!</Animated.Text>
+                            <Animated.Text style={{ color: "green", fontWeight: "bold", fontSize: 40 }}>Welcome {email}!</Animated.Text>
+                        </Animated.View>
+                    </>
+                ) : (
+                    <>
+                        <Animated.View style={[emailError || passwordError ? boxShake : null,
                         {
-                            emailError && <Text style={{ fontWeight: "bold", color: "red" }}>Your email is wrong</Text>
-                        }
+                            borderColor: successRegistration.interpolate({ inputRange: [0, 1], outputRange: ["red", "green"] }),
+                            border: "1px solid red",
+                            padding: 30,
+                            backgroundColor: successRegistration.interpolate({
+                                inputRange: [1, 2, 3],
+                                outputRange: ["white", "green", "white"]
+                            }),
+                        }]}>
+                            <Text style={styles.inputLabels}>Email</Text>
+                            <TextInput
+                                autoFocus
+                                value={email}
+                                onChangeText={(text) => {
+                                    setEmail(text)
+                                    if (firstTimeValidated && !text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/))
+                                        setEmailError(true)
+                                    else if (firstTimeValidated && text.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+                                        setEmailError(false)
+                                    }
+
+                                }}
+                                onFocus={() => {
+
+                                }}
+                                style={[styles.inputFields, { borderColor: "red", borderWidth: emailError ? 5 : 1, width: 360 }]}
+                            />
+
+                            <Text style={styles.inputLabels}>Password</Text>
+
+                            <View style={{ flexDirection: "row", borderColor: "red", borderWidth: passwordError ? 5 : 1 }}>
+                                <TextInput
+                                    autoFocus
+                                    value={password}
+                                    secureTextEntry={hiddenPassword}
+                                    onChangeText={(text) => {
+                                        setPassword(text)
+
+                                        if (firstTimeValidated && !text.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
+                                            setPasswordError(true)
+                                        }
+
+                                        else if (firstTimeValidated && text.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
+                                            setPasswordError(false)
+                                        }
+
+                                    }}
+                                    onFocus={() => {
+                                        console.log('Password focused');
+                                    }}
+                                    style={[styles.inputFields,]}
+                                />
+
+                                <TouchableOpacity onPressIn={() => {
+                                    setHiddenPassword(false)
+                                }}
+                                    onPressOut={() => {
+                                        setHiddenPassword(true)
+                                    }}
+                                    style={{
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        padding: 10,
+                                        display: "flex"
+                                    }}
+                                >
+                                    <Text style={{ fontSize: 10, fontWeight: "bold" }}>Show</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                        </Animated.View>
+
                         {
-                            passwordError && <Text style={{ fontWeight: "bold", color: "red" }}>Your Password is wrong</Text>
+                            emailError || passwordError && (
+                                <>
+                                    <Text style={{ fontWeight: "bold", color: "red" }}>Your credentials are wrong</Text>
+                                    {
+                                        emailError && <Text style={{ fontWeight: "bold", color: "red" }}>Your email is wrong</Text>
+                                    }
+                                    {
+                                        passwordError && <Text style={{ fontWeight: "bold", color: "red" }}>Your Password is wrong</Text>
+                                    }
+                                </>
+                            )
                         }
+                        <View style={{}}>
+
+                            <Animated.View style={{
+                                marginVertical: 20,
+                                borderRadius: 20,
+                                transform: [{
+                                    rotateY: successRegistration.interpolate({ inputRange: [0, 1], outputRange: [0 + "deg", 360 + "deg"] })
+                                }]
+                            }}>
+                                <TouchableOpacity style={styles.button} onPress={() => validateLogin()}>
+                                    <Text style={{ color: "white", fontWeight: "bold" }}> Register user </Text>
+                                </TouchableOpacity>
+                            </Animated.View>
+
+                            <TouchableOpacity style={[styles.button, { backgroundColor: "white", backgroundImage: "", border: "1px solid red" }]} onPress={() => navigation.goBack()}>
+                                <Text style={{ color: "black", fontWeight: "bold" }}> Login </Text>
+                            </TouchableOpacity>
+
+                        </View>
                     </>
                 )
             }
-            <View style={{}}>
-
-                <Animated.View style={{
-                    marginVertical: 20,
-                    borderRadius: 20,
-                    transform: [{
-                        rotateY: successRegistration.interpolate({ inputRange: [0, 1], outputRange: [0 + "deg", 360 + "deg"] })
-                    }]
-                }}>
-                    <TouchableOpacity style={styles.button} onPress={() => validateLogin()}>
-                        <Text style={{ color: "white", fontWeight: "bold" }}> {success ? "Successfully registered" : "Register user"} </Text>
-                    </TouchableOpacity>
-                </Animated.View>
-
-                <TouchableOpacity style={[styles.button, { backgroundColor: "white", backgroundImage: "", border: "1px solid red" }]} onPress={() => navigation.goBack()}>
-                    <Text style={{ color: "black", fontWeight: "bold" }}> Login </Text>
-                </TouchableOpacity>
-
-            </View>
-
         </View>
     )
 }
