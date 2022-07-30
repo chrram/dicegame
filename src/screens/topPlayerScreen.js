@@ -53,6 +53,11 @@ export const TopPlayerScreen = ({ navigation }) => {
 
     return (
         <View style={styles.app}>
+            <Text style={{fontWeight:"bold", fontSize:20}}>
+                Top High Score
+            </Text>
+
+            <View style={{marginVertical: 20, textAlign: "center"}}>
             {
                 fetchedUsers ?
                     fetchedUsers.map((users, i) =>
@@ -61,6 +66,7 @@ export const TopPlayerScreen = ({ navigation }) => {
             {
                 error && <Text>Error occured while fetching</Text>
             }
+            </View>
             <TouchableOpacity style={[styles.button]} onPress={() => navigation.goBack()}>
                 <Text style={{ color: "white", fontWeight: "bold" }}> Go back! </Text>
             </TouchableOpacity>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { TouchableOpacity, StyleSheet, Text, View, Image, Animated, Easing } from "react-native";
+import { TouchableOpacity, StyleSheet, Text, View, Animated, Easing } from "react-native";
 
 
 export const StartScreen = ({ navigation }) => {
@@ -27,13 +27,11 @@ export const StartScreen = ({ navigation }) => {
         setButtonDisabled(true)
 
         Animated.sequence([
-
             Animated.timing(spinAnimation1, {
                 toValue: 1,
                 duration: 1000,
                 useNativeDriver: true,
             }),
-
         ]).start(({ finished }) => {
 
             navigation.navigate('Login')

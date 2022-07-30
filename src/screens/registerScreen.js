@@ -8,7 +8,7 @@ export const RegisterScreen = ({ navigation }) => {
     const successRegistration = useRef(new Animated.Value(0)).current;
     const errorRegistration = useRef(new Animated.Value(0)).current;
 
-    const [email, setEmail] = useState("anc@ju.se")
+    const [email, setEmail] = useState("rach1524@student.ju.se")
     const [password, setPassword] = useState("abcDEF4")
 
     const [emailError, setEmailError] = useState(false)
@@ -42,7 +42,7 @@ export const RegisterScreen = ({ navigation }) => {
 
     const registerUser = () => {
 
-        const realRegister = false
+        const realRegister = true
 
         if (realRegister) {
 

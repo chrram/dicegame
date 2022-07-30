@@ -6,7 +6,7 @@ import { token, userInfo } from "../App";
 export const LoginScreen = ({ navigation }) => {
 
     const [email, setEmail] = useState("rach1524@student.ju.se")
-    const [password, setPassword] = useState("ee")
+    const [password, setPassword] = useState("abcDEF4")
     const [loginError, setLoginError] = useState(false)
     const [disabledInteraction, setDisabledInteraction] = useState(false)
 
