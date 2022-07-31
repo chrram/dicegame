@@ -23,6 +23,8 @@ export const RegisterScreen = ({ navigation }) => {
 
     const [success, setSuccess] = useState(false)
 
+    const [serverError, setServerError] = useState("")
+
     const dispatch = useDispatch()
 
     const validateLogin = () => {
@@ -57,11 +59,12 @@ export const RegisterScreen = ({ navigation }) => {
                     "Content-Type": "application/x-www-form-urlencoded", "Accept": "*/*"
                 },
                 body: `email=${email}&password=${password}`
-            }).then(response => {
+            }).then((response) => {
 
                 if (response.status === 201) {
                     return response.json()
                 } else {
+                    console.log(response, "response")
                     throw new Error(response.status)
                 }
             }).then((data) => {
@@ -74,12 +77,12 @@ export const RegisterScreen = ({ navigation }) => {
                 })
 
             })
-
                 .catch((error) => {
-                    if (error.message === "400") {
 
+                    if (error.message === "400") {
+                        setServerError("Duplicate")
                     } else {
-                        console.log("Network error")
+                        setServerError("Error")
                     }
 
                 });
@@ -230,6 +233,13 @@ export const RegisterScreen = ({ navigation }) => {
                                     <Text style={{ fontSize: 10, fontWeight: "bold" }}>Show</Text>
                                 </TouchableOpacity>
                             </View>
+
+                            {
+                                serverError && serverError === "Duplicate" && <Text style={{ color: "red", fontWeight: "bold" }}>This account already exists</Text>
+                            }
+                            {
+                                serverError && serverError === "Error" && <Text style={{ color: "red", fontWeight: "bold" }}>Some server error occured</Text>
+                            }
 
                         </Animated.View>
 
